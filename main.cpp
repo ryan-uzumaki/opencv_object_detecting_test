@@ -1,4 +1,4 @@
-
+#include <algorithm>
 #include <iostream>
 #include <opencv2\opencv.hpp>
 #include <opencv2/imgproc/types_c.h>
@@ -7,12 +7,26 @@
 #include "core/core.hpp"  
 #include "highgui/highgui.hpp"  
 #include "imgproc/imgproc.hpp"  
+#include <cmath>
 
 using namespace std;
 using namespace cv;
 
 
 void object_recognition(Mat& image);
+
+template<class ForwardIterator>
+inline size_t argmin(ForwardIterator first, ForwardIterator last)
+{
+	return std::distance(first, std::min_element(first, last));
+}
+
+template<class ForwardIterator>
+inline size_t argmax(ForwardIterator first, ForwardIterator last)
+{
+	return std::distance(first, std::max_element(first, last));
+}
+
 
 int main() {
 	VideoCapture capture(0);
@@ -38,14 +52,35 @@ int main() {
 		vector<vector<Point>> contours;
 		vector<Vec4i> hierarchy;
 		findContours(mask, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE, Point());
+		vector<double> area;
+		for (int i = 0; i < contours.size(); i++) {
+			area.push_back(contourArea(contours[i]));
+		}
+		size_t maxIndex = argmax(area.begin(), area.end());
+		Rect ret_1 = boundingRect(contours[maxIndex]);
+		int avgX, avgY;
+		avgX = (ret_1.x + ret_1.width) / 2;
+		avgY = (ret_1.y + ret_1.height) / 2;
 		for (int i = 0; i < contours.size(); i++) {
 			for (int j = 0; j < contours[i].size(); j++) {
 				Point P = Point(contours[i][j].x, contours[i][j].y);
 				Mat Contours = Mat::zeros(m_ResImg.size(), CV_8UC1);  //»æÖÆ
 				Contours.at<uchar>(P) = 255;
 			}
-			drawContours(frame, contours, i, Scalar(0, 255, 0), 2, 8, hierarchy);
+			Rect box(ret_1.x, ret_1.y, ret_1.width, ret_1.height);
+			rectangle(frame, box, Scalar(0, 0, 255), 2, 8, 0);
+			drawContours(frame, contours, maxIndex, Scalar(0, 255, 0), 2, 8, hierarchy);
 		}
+		
+	/*	for (size_t k=0; k < contours.size(); k++) {
+			Rect ret_1 = boundingRect(contours[k]);
+			int avgX, avgY;
+			avgX = (ret_1.x + ret_1.width) / 2;
+			avgY = (ret_1.y + ret_1.height) / 2;
+			Rect box(ret_1.x, ret_1.y, ret_1.width, ret_1.height);
+			rectangle(frame, box, Scalar(0, 0, 255), 2, 8, 0);
+		}*/
+		
 		namedWindow("detected", WINDOW_FREERATIO);
 		imshow("detected", frame);
 		int c = waitKey(1);
