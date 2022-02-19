@@ -8,12 +8,18 @@
 #include "highgui/highgui.hpp"  
 #include "imgproc/imgproc.hpp"  
 #include <cmath>
+#include <sstream>
+
 
 using namespace std;
 using namespace cv;
+int known_W = 9;
+int known_P = 510;
 
-
+double get_distance(int W, int P);
 void object_recognition(Mat& image);
+string Convert(float Num);
+
 
 template<class ForwardIterator>
 inline size_t argmin(ForwardIterator first, ForwardIterator last)
@@ -71,16 +77,9 @@ int main() {
 			rectangle(frame, box, Scalar(0, 0, 255), 2, 8, 0);
 			drawContours(frame, contours, maxIndex, Scalar(0, 255, 0), 2, 8, hierarchy);
 		}
-		
-	/*	for (size_t k=0; k < contours.size(); k++) {
-			Rect ret_1 = boundingRect(contours[k]);
-			int avgX, avgY;
-			avgX = (ret_1.x + ret_1.width) / 2;
-			avgY = (ret_1.y + ret_1.height) / 2;
-			Rect box(ret_1.x, ret_1.y, ret_1.width, ret_1.height);
-			rectangle(frame, box, Scalar(0, 0, 255), 2, 8, 0);
-		}*/
-		
+		double dist = get_distance(known_W, ret_1.width);
+		string dist_str = Convert(dist);
+		putText(frame, "Distance:" + dist_str + "cm", Point(50, 50), FONT_HERSHEY_COMPLEX, 1, Scalar(50, 250, 50), 2, 8);
 		namedWindow("detected", WINDOW_FREERATIO);
 		imshow("detected", frame);
 		int c = waitKey(1);
@@ -88,9 +87,26 @@ int main() {
 			break;
 		}
 	}
+	capture.release();
 	return 0;
 }
 
+
+string Convert(float Num)
+{
+	std::ostringstream oss;
+	oss << Num;
+	std::string str(oss.str());
+	return str;
+}
+
+
+double get_distance(int W, int P) {
+	double F = 850;
+	double D = 0;
+	D = (W * F) / P;
+	return D;
+}
 
 
 void object_recognition(Mat& image) {
@@ -192,3 +208,4 @@ void detect_object(Mat& imageSource) {
 	//imshow("Point of Contours", Contours);   //向量contours内保存的所有轮廓点集
 	waitKey(0);
 }
+
