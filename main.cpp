@@ -102,7 +102,7 @@ string Convert(float Num)
 
 
 double get_distance(int W, int P) {
-	double F = 850;
+	double F = 550;
 	double D = 0;
 	D = (W * F) / P;
 	return D;
