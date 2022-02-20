@@ -1,3 +1,4 @@
+#pragma once
 #include <algorithm>
 #include <iostream>
 #include <opencv2\opencv.hpp>
@@ -9,7 +10,30 @@
 #include "imgproc/imgproc.hpp"  
 #include <cmath>
 #include <sstream>
-#include "Process.h"
+#include <iterator>
+
+using namespace std;
+using namespace cv;
+//
+//template<class ForwardIterator>
+//inline size_t argmin(ForwardIterator first, ForwardIterator last)
+//{
+//	return std::distance(first, std::min_element(first, last));
+//}
+//
+//template<class ForwardIterator>
+//inline size_t argmax(ForwardIterator first, ForwardIterator last)
+//{
+//	return std::distance(first, std::max_element(first, last));
+//}
+
+class Process {
+public:
+	double get_distance(int W, int P);
+	//Point frame_1_center_point(Mat& image);
+	string Convert(float Num);
+	void object_recognition(Mat& image);
+};
 
 template<class ForwardIterator>
 inline size_t argmin(ForwardIterator first, ForwardIterator last)
@@ -38,12 +62,15 @@ double Process::get_distance(int W, int P) {
 	D = (W * F) / P;
 	return D;
 }
-void Process::object_recognition(Mat& frame) {
+
+
+void Process::object_recognition(Mat& image) {
+	Process pr;
 	int known_W = 9;
 	int known_P = 510;
-	Mat temp = Mat::zeros(frame.size(), frame.type());
-	Mat m = Mat::zeros(frame.size(), frame.type());
-	addWeighted(frame, 0.19, m, 0.0, 0, temp);
+	Mat temp = Mat::zeros(image.size(), image.type());
+	Mat m = Mat::zeros(image.size(), image.type());
+	addWeighted(image, 0.19, m, 0.0, 0, temp);
 	Mat dst;
 	bilateralFilter(temp, dst, 5, 20, 20);
 	Mat m_ResImg;
@@ -61,7 +88,7 @@ void Process::object_recognition(Mat& frame) {
 	for (int i = 0; i < contours.size(); i++) {
 		area.push_back(contourArea(contours[i]));
 	}
-	size_t maxIndex = argmax(area.begin(), area.end());
+	size_t maxIndex = distance(area.begin(), max_element(area.begin(),area.end()));
 	Rect ret_1 = boundingRect(contours[maxIndex]);
 	int avgX, avgY;
 	avgX = (ret_1.x + ret_1.width) / 2;//x-axis middle point
@@ -73,12 +100,12 @@ void Process::object_recognition(Mat& frame) {
 		//	Contours.at<uchar>(P) = 255;
 		//}
 		Rect box(ret_1.x, ret_1.y, ret_1.width, ret_1.height);
-		rectangle(frame, box, Scalar(0, 0, 255), 2, 8, 0);
-		drawContours(frame, contours, maxIndex, Scalar(0, 255, 0), 2, 8, hierarchy);
+		rectangle(image, box, Scalar(0, 0, 255), 2, 8, 0);
+		drawContours(image, contours, maxIndex, Scalar(0, 255, 0), 2, 8, hierarchy);
 	}
-	double dist = get_distance(known_W, ret_1.width);
-	string dist_str = Convert(dist);
-	putText(frame, "Distance:" + dist_str + "cm", Point(50, 50), FONT_HERSHEY_COMPLEX, 1, Scalar(50, 250, 50), 2, 8);
+	double dist = pr.get_distance(known_W, ret_1.width);
+	string dist_str = pr.Convert(dist);
+	putText(image, "Distance:" + dist_str + "cm", Point(50, 50), FONT_HERSHEY_COMPLEX, 1, Scalar(50, 250, 50), 2, 8);
 	namedWindow("detected", WINDOW_FREERATIO);
-	imshow("detected", frame);
+	imshow("detected", image);
 }

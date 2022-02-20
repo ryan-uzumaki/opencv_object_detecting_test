@@ -18,13 +18,10 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Process_functions.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Process.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="Process.hpp">
+      <Filter>资源文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

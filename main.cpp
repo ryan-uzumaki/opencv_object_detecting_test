@@ -9,16 +9,18 @@
 #include "imgproc/imgproc.hpp"  
 #include <cmath>
 #include <sstream>
+#include "Process.hpp"
+#include <iterator>
 
 
 using namespace std;
 using namespace cv;
 
 
-double get_distance(int W, int P);
-void object_recognition(Mat& image);
-Point frame_1_center_point(Mat& image);
-string Convert(float Num);
+//double get_distance(int W, int P);
+//void object_recognition(Mat& image);
+//Point frame_1_center_point(Mat& image);
+//string Convert(float Num);
 
 
 //template<class ForwardIterator>
