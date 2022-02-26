@@ -11,6 +11,7 @@
 #include <sstream>
 #include <iterator>
 #include "Process.hpp"
+#include <opencv2\video\video.hpp>
 
 
 using namespace std;
@@ -168,11 +169,13 @@ using namespace cv;
 
 int main() {
 	VideoCapture capture(0);
-	//VideoCapture capture_1(0);
-	Mat frame;
-	Mat frame_1;
+	capture.set(CAP_PROP_FRAME_WIDTH, 640);
+	capture.set(CAP_PROP_FRAME_HEIGHT, 480);
 	Process object;
 	while (true) {
+		Mat frame;
+		Mat frame_1;
+		//cout << capture.get(CAP_PROP_POS_MSEC) << endl;
 		/*capture.read(frame);
 		waitKey(1);
 		capture_1.read(frame_1);*/
@@ -185,11 +188,12 @@ int main() {
 		/*namedWindow("capture", WINDOW_AUTOSIZE);
 		imshow("capture", frame);
 		imshow("capture", frame_1);*/
-		int c = waitKey(1);
+		//int c=waitKey(1000 / capture.get(CAP_PROP_FPS));
+		int c = waitKey(10);
 		if (c == 27) { // ÍË³ö
 			break;
 		}
 	}
-	//capture.release();
+	capture.release();
 	return 0;
 }
